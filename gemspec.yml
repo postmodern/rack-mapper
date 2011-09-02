@@ -1,0 +1,21 @@
+name: rack-mapper
+version: 0.0.0
+summary: Map DataMapper models and methods to RESTful Rack routes.
+description:
+  A Rack middleware which allows mapping DataMapper models and their
+  methods to RESTful Rack routes.
+
+license: MIT
+authors: Postmodern
+email: postmodern.mod3@gmail.com
+homepage: http://github.org/postmodern/rack-mapper
+
+dependencies:
+  rack: ~> 1.0
+  dm-core: ~> 1.0
+  dm-serializer: ~> 1.0
+
+development_dependencies:
+  ore-tasks: ~> 0.4
+  rspec: ~> 2.4
+  yard: ~> 0.7.0
