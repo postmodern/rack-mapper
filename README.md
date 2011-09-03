@@ -13,10 +13,48 @@ methods to RESTful Rack routes.
 
 ## Examples
 
+    require 'dm-core'
+
+    class Post
+    
+      include DataMapper::Resource
+
+      property :id, Serial
+
+      property :title, String
+
+      property :body, Text
+
+      belongs_to :user
+
+    end
+
+    class User
+
+      include DataMapper::Resource
+
+      property :id, Serial
+
+      property :name, String
+
+      has n, :posts
+
+    end
+
     require 'rack/mapper'
 
     use Rack::Mapper do
+      expose User
+      expose Post
     end
+    # PUT    /users
+    # GET    /users
+    # GET    /users/1
+    # DELETE /users/1
+    # PUT    /users/1/posts
+    # GET    /users/1/posts
+    # GET    /users/1/posts/1
+    # GET    /users/1/posts/1/users
 
 ## Requirements
 

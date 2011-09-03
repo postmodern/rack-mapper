@@ -24,20 +24,7 @@ module Rack
       url = url[0..-2] if url[-1..-1] == '/'
 
       @routes[url.split('/')] = model
-
-      @actions[model] = {
-        :index   => options.fetch(:index,:all),
-        :create  => options.fetch(:create,:create),
-        :show    => options.fetch(:show,:get),
-        :destroy => options.fetch(:destroy,:destroy),
-
-        :class => {},
-        :instance => {}
-      }
-
-      model.relationships.each do |relationship|
-        @resources[mode][relationship.name] = relationship.child_model
-      end
+      @resources[model] = Resource.new(model,&block)
     end
 
     Inflector = DataMapper::Inflector
