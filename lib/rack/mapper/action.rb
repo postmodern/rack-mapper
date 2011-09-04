@@ -26,7 +26,7 @@ module Rack
         end
       end
 
-      def initialize(method_name,params)
+      def initialize(method_name,params=nil)
         @method_name = method_name
         @params = params
 
@@ -38,7 +38,7 @@ module Rack
         when nil
           extend Params
         else
-          raise(":params must be a Hash, Array or nil")
+          raise(TypeError,"params must be a Hash, Array or nil")
         end
       end
 
