@@ -15,7 +15,7 @@ module Rack
     # Regular expression to match actions
     ACTION_REGEXP = /^[a-z][a-zA-Z0-9_]$/
 
-    def expose(model,options={})
+    def map(model,options={})
       name = options.fetch(:name,default_resource_name(model))
       url = options.fetch(:map,name)
 
