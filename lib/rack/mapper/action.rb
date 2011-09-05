@@ -16,7 +16,15 @@ module Rack
 
       module Arguments
         def arguments(params)
-          @params.map { |param_name| params[param_name] }
+          arguments = []
+
+          @params.each do |param_name|
+            if (value = params[param_name])
+              arguments << value
+            end
+          end
+
+          arguments
         end
       end
 
@@ -25,6 +33,12 @@ module Rack
           params
         end
       end
+
+      # The method name of the action
+      attr_reader :method_name
+
+      # The params to pass to the method
+      attr_reader :params
 
       def initialize(method_name,params=nil)
         @method_name = method_name
