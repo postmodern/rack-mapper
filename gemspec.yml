@@ -18,4 +18,6 @@ dependencies:
 development_dependencies:
   ore-tasks: ~> 0.4
   rspec: ~> 2.4
+  dm-migrations: ~> 1.0
+  sinatra: ~> 1.0
   yard: ~> 0.7.0
