@@ -1,13 +1,20 @@
 module Rack
   class Mapper
 
+    attr_reader :routes
+
+    attr_reader :resources
+
     def initialize(app,options={},&block)
       @app = app
 
       @routes = {}
-      @actions = {}
+      @resources = {}
 
       instance_eval(&block) if block
+    end
+
+    def call(env)
     end
 
     protected
@@ -15,7 +22,7 @@ module Rack
     # Regular expression to match actions
     ACTION_REGEXP = /^[a-z][a-zA-Z0-9_]$/
 
-    def map(model,options={})
+    def map(model,options={},&block)
       name = options.fetch(:name,default_resource_name(model))
       url = options.fetch(:map,name)
 
@@ -24,7 +31,7 @@ module Rack
       url = url[0..-2] if url[-1..-1] == '/'
 
       @routes[url.split('/')] = model
-      @resources[model] = Resource.new(model,&block)
+      @resources[model] = Resource.new(model,options,&block)
     end
 
     Inflector = DataMapper::Inflector
@@ -32,7 +39,7 @@ module Rack
     def default_resource_name(model)
       Inflector.pluralize(
         Inflector.underscore(
-          Inflector.demoularize(model.name)
+          Inflector.demodulize(model.name)
         )
       )
     end
