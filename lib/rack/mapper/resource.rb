@@ -4,48 +4,92 @@ module Rack
   class Mapper
     class Resource
 
+      # Default methods for RESTful actions
+      ACTION_METHODS = {
+        :index => :all,
+        :show => :get,
+        :create => :create,
+        :update => :update,
+        :destroy => :destroy
+      }
+
       # The model of the Resource
       attr_reader :model
 
       # The class actions of the Resource
-      attr_reader :class_actions
+      attr_reader :collection_actions
 
       # The instance actions of the Resource
-      attr_reader :instance_actions
+      attr_reader :resource_actions
 
       def initialize(model,options={},&block)
         @model = model
 
-        @class_actions = {}
-        @instance_actions = {}
+        @collection_actions = {}
+        @resource_actions = {}
+
+        action_method = lambda { |name|
+          case options[name]
+          when true
+            ACTION_METHODS[name]
+          when String, Symbol
+            name.to_sym
+          end
+        }
+
+        if (index = action_method[:index])
+          @collection_actions[[:get, :index]] = Action.new(index)
+        end
+
+        if (show = action_method[:show])
+          @collection_actions[[:get, :show]] = Action.new(show,@model.key.map(&:name))
+        end
+
+        if (create = action_method[:create])
+          @collection_actions[[:post, :create]] = Action.new(create)
+        end
+
+        if (update = action_method[:update])
+          @resource_actions[[:put, :update]] = Action.new(update)
+        end
+
+        if (destroy = action_method[:destroy])
+          @resource_actions[[:delete, :destroy]] = Action.new(destroy)
+        end
 
         instance_eval(&block) if block
       end
 
       protected
 
-      def get(name,options={});  action(name,options); end
-      def post(name,options={}); action(name,options); end
+      def get(name,options={});  action(:get,name,options);  end
+      def post(name,options={}); action(:post,name,options); end
 
       private
 
-      def action(name,options={})
-        method_name = options.fetch(:method,name)
+      def collection_action(verb,name,method_name,params)
+        method = @model.public_method(method_name)
 
-        method_name = if RUBY_VERSION > '1.9'
-                        # convert the method name to a Symbol on 1.9.x
-                        method_name.to_sym
-                      else
-                        # convert the method name to a String on 1.8.x
-                        method_name.to_s
-                      end
+        @collection_actions[[verb, name]] = Action.new(method,params)
+      end
 
-        if @model.respond_to?(method_name)
-          @class_actions[name] = Action.new(method_name,options[:params])
+      def resource_action(verb,name,method_name,params)
+        method = @model.public_instance_method(method_name)
+
+        @resource_actions[[verb, name]] = Action.new(method,params)
+      end
+
+      def action(verb,name,options={})
+        name        = name.to_s
+        method_name = options.fetch(:method,name).to_sym
+        params      = options[:params]
+
+        if options.fetch(:collection,true)
+          collection_action(verb,name,method_name,params)
         end
 
-        if @model.instance_methods.include?(method_name)
-          @instance_actions[name] = Action.new(method_name,options[:params])
+        if options.fetch(:resource,true)
+          resource_action(verb,name,method_name,params)
         end
       end
 
