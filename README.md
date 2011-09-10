@@ -27,6 +27,10 @@ methods to RESTful Rack routes.
 
       belongs_to :user
 
+      def summary(n)
+        self.body.split(/s+/,n).join(' ') + ' ...'
+      end
+
     end
 
     class User
@@ -44,17 +48,16 @@ methods to RESTful Rack routes.
     require 'rack/mapper'
 
     use Rack::Mapper do
-      expose User
-      expose Post
+      map User
+      map Post do
+        get :summary, :params => [:n]
+      end
     end
-    # PUT    /users
     # GET    /users
     # GET    /users/1
-    # DELETE /users/1
-    # PUT    /users/1/posts
-    # GET    /users/1/posts
-    # GET    /users/1/posts/1
-    # GET    /users/1/posts/1/users
+    # GET    /posts
+    # GET    /posts/1
+    # GET    /posts/1/summary?n=100
 
 ## Requirements
 
