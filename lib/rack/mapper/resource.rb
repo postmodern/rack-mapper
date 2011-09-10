@@ -29,7 +29,6 @@ module Rack
         options = DEFAULT_OPTIONS.merge(options)
 
         @model = model
-
         @collection_actions = {}
         @resource_actions = {}
 
@@ -72,29 +71,19 @@ module Rack
 
       private
 
-      def collection_action(verb,name,method_name,params)
-        method = @model.public_method(method_name)
-
-        @collection_actions[[verb, name]] = Action.new(method,params)
-      end
-
-      def resource_action(verb,name,method_name,params)
-        method = @model.public_instance_method(method_name)
-
-        @resource_actions[[verb, name]] = Action.new(method,params)
-      end
-
       def action(verb,name,options={})
         name        = name.to_s
         method_name = options.fetch(:method,name).to_sym
-        params      = options[:params]
+
+        route = [verb, name]
+        action = Action.new(method_name,options[:params])
 
         if options.fetch(:collection,true)
-          collection_action(verb,name,method_name,params)
+          @collection_actions[route] = action
         end
 
         if options.fetch(:resource,true)
-          resource_action(verb,name,method_name,params)
+          @resource_actions[route] = action
         end
       end
 
