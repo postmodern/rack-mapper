@@ -7,7 +7,11 @@ module Rack
           options = {}
 
           @params.each do |param_name,option_name|
-            options[option_name] = params[param_name]
+            if option_name == true
+              option_name = param_name
+            end
+
+            options[option_name.to_sym] = params[param_name.to_s]
           end
 
           options
@@ -19,7 +23,7 @@ module Rack
           arguments = []
 
           @params.each do |param_name|
-            if (value = params[param_name])
+            if (value = params[param_name.to_s])
               arguments << value
             end
           end
