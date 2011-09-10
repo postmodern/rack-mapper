@@ -31,13 +31,13 @@ describe Rack::Mapper::Action do
   describe "#arguments" do
     context "Options" do
       subject do
-        described_class.new(:foo, 'baz' => :bar, 'quix' => 'quiz')
+        described_class.new(:foo, 'baz' => :bar, 'quix' => true)
       end
 
       it "should only map the specified option keys" do
         subject.arguments('baz' => 1, 'quix' => 2).should == {
           :bar => 1,
-          'quiz' => 2
+          :quix => 2
         }
       end
     end
