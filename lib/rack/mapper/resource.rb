@@ -13,6 +13,9 @@ module Rack
         :destroy => :destroy
       }
 
+      # Default options to enable
+      DEFAULT_OPTIONS = {:index => true, :show => true}
+
       # The model of the Resource
       attr_reader :model
 
@@ -23,6 +26,8 @@ module Rack
       attr_reader :resource_actions
 
       def initialize(model,options={},&block)
+        options = DEFAULT_OPTIONS.merge(options)
+
         @model = model
 
         @collection_actions = {}
@@ -62,8 +67,8 @@ module Rack
 
       protected
 
-      def get(name,options={});  action(:get,name,options);  end
-      def post(name,options={}); action(:post,name,options); end
+      def get(name,options={});  action(:GET,name,options);  end
+      def post(name,options={}); action(:POST,name,options); end
 
       private
 
