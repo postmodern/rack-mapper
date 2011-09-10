@@ -38,23 +38,23 @@ module Rack
         }
 
         if (index = action_method[:index])
-          @collection_actions[[:get, :index]] = Action.new(index)
+          @collection_actions[:index] = Action.new(index)
         end
 
         if (show = action_method[:show])
-          @collection_actions[[:get, :show]] = Action.new(show,@model.key.map(&:name))
+          @collection_actions[:show] = Action.new(show,@model.key.map(&:name))
         end
 
         if (create = action_method[:create])
-          @collection_actions[[:post, :create]] = Action.new(create)
+          @collection_actions[:create] = Action.new(create)
         end
 
         if (update = action_method[:update])
-          @resource_actions[[:put, :update]] = Action.new(update)
+          @resource_actions[:update] = Action.new(update)
         end
 
         if (destroy = action_method[:destroy])
-          @resource_actions[[:delete, :destroy]] = Action.new(destroy)
+          @resource_actions[:destroy] = Action.new(destroy)
         end
 
         instance_eval(&block) if block
