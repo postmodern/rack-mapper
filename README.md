@@ -62,6 +62,7 @@ methods to RESTful Rack routes.
 ## Requirements
 
 * [rack](http://github.com/rack/rack) ~> 1.0
+* [virtus](http://github.com/solnic/virtus) ~> 0.0
 * [dm-core](http://github.com/datamapper/dm-core) ~> 1.0
 * [dm-serializer](http://github.com/datamapper/dm-serializer) ~> 1.0
 

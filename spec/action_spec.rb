@@ -18,7 +18,7 @@ describe Rack::Mapper::Action do
     it "when params is nil" do
       action = described_class.new(:foo,nil)
       
-      action.should be_kind_of(described_class::Params)
+      action.should be_kind_of(described_class::Mash)
     end
 
     it "should raise a TypeError for unrecognized params" do
@@ -28,46 +28,40 @@ describe Rack::Mapper::Action do
     end
   end
 
-  describe "#arguments" do
-    context "Options" do
-      subject do
-        described_class.new(:foo, 'baz' => :bar, 'quix' => true)
+  describe "#dispatch" do
+    let(:resource) do
+      obj = Object.new
+      obj.instance_eval do
+        def test(*arguments)
+          arguments
+        end
       end
 
-      it "should only map the specified option keys" do
-        subject.arguments('baz' => 1, 'quix' => 2).should == {
-          :bar => 1,
-          :quix => 2
-        }
-      end
+      obj
     end
 
-    context "Arguments" do
-      subject do
-        described_class.new(:foo, ['bax', 'baz', 'bar'])
-      end
+    it "should pass Option params as a single Hash argument" do
+      action = described_class.new(:test,{'a' => '1', 'b' => '2'})
 
-      it "should map the param keys to an Array of arguments" do
-        subject.arguments({'bar' => 1, 'baz' => 2, 'bax' => 3}).should == [
-          3, 2, 1
-        ]
-      end
-
-      it "should not map param keys if they have no value" do
-        subject.arguments({'baz' => 2, 'bax' => 3}).should == [
-          3, 2
-        ]
-      end
+      action.dispatch(resource,{'1' => 'x', '2' => 'y'}).should == [
+        {'a' => 'x', 'b' => 'y'}
+      ]
     end
 
-    context "Params" do
-      subject { described_class.new(:foo,nil) }
+    it "should pass Argument params as multiple arguments" do
+      action = described_class.new(:test,['a', 'b'])
 
-      it "should pass the params through" do
-        params = {'bar' => 1, 'baz' => 2}
+      action.dispatch(resource,{'a' => 'x', 'b' => 'y'}).should == [
+        'x', 'y'
+      ]
+    end
 
-        subject.arguments(params).should == params
-      end
+    it "should pass Mash params as a single Mash argument" do
+      action = described_class.new(:test)
+      arguments = action.dispatch(resource,{'a' => 'x', 'b' => 'y'})
+
+      arguments.length.should == 1
+      arguments[0].should be_kind_of(DataMapper::Mash)
     end
   end
 end

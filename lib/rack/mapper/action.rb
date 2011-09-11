@@ -1,40 +1,49 @@
+require 'rack/mapper/params'
+
+require 'dm-core/support/mash'
+
 module Rack
   class Mapper
     class Action
 
       module Options
-        def arguments(params)
-          options = {}
+        protected
 
-          @params.each do |param_name,option_name|
-            if option_name == true
-              option_name = param_name
-            end
+        def initialize_params(params)
+          params.each do |name,(mapping,type)|
+            # map `true` to the option name
+            mapping = name if mapping == true
 
-            options[option_name.to_sym] = params[param_name.to_s]
+            @params.param(name,mapping,type)
           end
+        end
 
-          options
+        def arguments(params)
+          [@params.new(params).to_hash]
         end
       end
 
       module Arguments
-        def arguments(params)
-          arguments = []
+        protected
 
-          @params.each do |param_name|
-            if (value = params[param_name.to_s])
-              arguments << value
-            end
+        def initialize_params(params)
+          params.each do |name,type|
+            @params.param(name,type)
           end
+        end
 
-          arguments
+        def arguments(params)
+          @params.new(params).to_a
         end
       end
 
-      module Params
+      module Mash
+        def initialize_params(params)
+          @params = nil
+        end
+
         def arguments(params)
-          params
+          [DataMapper::Mash.new(params)]
         end
       end
 
@@ -46,18 +55,20 @@ module Rack
 
       def initialize(method_name,params=nil)
         @method_name = method_name
-        @params = params
+        @params = Class.new(Params)
 
-        case @params
+        case params
         when Hash
           extend Options
         when Array
           extend Arguments
         when nil
-          extend Params
+          extend Mash
         else
           raise(TypeError,"params must be a Hash, Array or nil")
         end
+
+        initialize_params(params)
       end
 
       def dispatch(resource,params)
