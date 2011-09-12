@@ -28,7 +28,7 @@ methods to RESTful Rack routes.
       belongs_to :user
 
       def summary(n)
-        self.body.split(/s+/,n).join(' ') + ' ...'
+        self.body.split(/s+/,n).take(n).join(' ') + ' ...'
       end
 
     end
