@@ -17,7 +17,7 @@ dependencies:
   dm-serializer: ~> 1.0
 
 development_dependencies:
-  ore-tasks: ~> 0.4
+  rubygems-tasks: ~> 0.1
   rspec: ~> 2.4
   dm-migrations: ~> 1.0
   sinatra: ~> 1.0
